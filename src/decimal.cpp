@@ -8,7 +8,9 @@ namespace tnt::xsd
 Decimal::Decimal(const long double value)
     : AnySimpleType(value)
 {
-    this->white_space(facet::WhiteSpace::collapse);
+    Restriction restriction(this);
+    restriction.white_space(WhiteSpace::collapse);
+    restriction.apply();
 }
 
 }  // namespace tnt::xsd

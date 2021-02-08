@@ -12,4 +12,5 @@ tnt_project_AddLibrary(${PROJECT_NAME}
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Boost::headers)
+# TODO: Try to make this private by moving implementation of any_simple_type to cpp file
+target_link_libraries(${PROJECT_NAME} PUBLIC Boost::headers)

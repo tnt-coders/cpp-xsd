@@ -8,7 +8,9 @@ namespace tnt::xsd
 Double::Double(const double value)
     : AnySimpleType(value)
 {
-    this->white_space(facet::WhiteSpace::collapse);
+    Restriction restriction(this);
+    restriction.white_space(WhiteSpace::collapse);
+    restriction.apply();
 }
 
 }  // namespace tnt::xsd

@@ -287,9 +287,16 @@ void AnySimpleType<T>::Restriction::apply_fraction_digits() const
     // Only applies to floating point types
     if constexpr (std::is_floating_point_v<value_type>)
     {
-        const auto scale = std::pow(10, m_fraction_digits.value());
-
-        m_this->m_value = std::round(m_this->m_value * scale) / scale;
+        // TODOTODOTODO
+        //
+        // TODO: This rounding should occur when printing to an xml file (converting to a string)
+        // TODO: This should not be checked during validation
+        //
+        // Also use iomanip to set proper precision for printing
+        //
+        // TODOTODOTODO
+        // const auto scale = std::pow(10, m_fraction_digits.value());
+        // m_this->m_value = std::round(m_this->m_value * scale) / scale;
     }
 }
 
@@ -474,9 +481,29 @@ void AnySimpleType<T>::Restriction::apply_total_digits() const
     // Only applies to numeric types
     if constexpr (std::is_arithmetic_v<value_type>)
     {
-        // TODO TODO TODO
-        // TODO: Finish this function
-        // TODO TODO TODO
+        const auto max = std::pow(10, m_total_digits.value()) - 1;
+        if (std::abs(m_this->m_value) > max)
+        {
+            throw std::runtime_error("restrict_total_digits failed - value too large");
+        }
+
+        const auto min = std::pow(10, -(m_total_digits.value() + 1));
+        if (std::abs(m_this->m_value) < min)
+        {
+            throw std::runtime_error("restrict_total_digits failed - value too small");
+        }
+
+        // TODOTODOTODO
+        //
+        // TODO: This rounding should occur when printing to an xml file (converting to a string)
+        // TODO: This should not be checked during validation
+        //
+        // Also use iomanip to set proper precision for printing
+        //
+        // TODOTODOTODO
+        // const auto scale = std::pow(10, m_total_digits.value() -
+        // std::floor(std::log(m_this->m_value)) - 1); m_this->m_value *= scale; m_this->m_value =
+        // std::round(m_this->m_value); m_this->m_value /= scale;
     }
 }
 

@@ -8,9 +8,13 @@ namespace tnt::xsd
 Decimal::Decimal(const long double value)
     : AnySimpleType(value)
 {
-    Restriction restriction(this);
-    restriction.white_space(WhiteSpace::collapse);
-    restriction.apply();
+    this->white_space(WhiteSpace::collapse);
+    this->validate();
+}
+
+Decimal::Restrictions& Decimal::restrictions()
+{
+    return m_restrictions;
 }
 
 }  // namespace tnt::xsd

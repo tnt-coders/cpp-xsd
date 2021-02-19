@@ -5,10 +5,14 @@
 namespace tnt::xsd
 {
 
-class Double : public AnySimpleType<double>
+template <typename SimpleType>
+class Double : public AnySimpleType<Double<SimpleType>, double>
 {
 public:
     Double(double value);
+
+private:
+    Restrictions m_restrictions;
 };
 
 }  // namespace tnt::xsd

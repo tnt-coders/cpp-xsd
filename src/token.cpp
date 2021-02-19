@@ -9,10 +9,10 @@ namespace tnt::xsd
 
 Token::Token(const std::string& value)
     : NormalizedString(value)
+    , m_restriction(this)
 {
-    Restriction restriction(this);
-    restriction.white_space(WhiteSpace::collapse);
-    restriction.apply();
+    m_restriction.white_space(WhiteSpace::collapse);
+    m_restriction.apply();
 }
 
 }  // namespace tnt::xsd

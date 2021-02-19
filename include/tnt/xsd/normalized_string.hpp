@@ -10,21 +10,12 @@ namespace tnt::xsd
 class NormalizedString : public String
 {
 public:
-    NormalizedString(const std::string& value);
-
-protected:
-    virtual Restrictions restrictions() const override
+    NormalizedString(const std::string& value)
+        : String(value)
     {
-        return m_restrictions;
+        this->white_space(WhiteSpace::replace);
+        this->validate();
     }
-
-    virtual void restrictions(const Restrictions& restrictions) override
-    {
-        m_restrictions = restrictions;
-    }
-
-private:
-    Restrictions m_restrictions;
 };
 
 }  // namespace tnt::xsd

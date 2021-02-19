@@ -7,5 +7,5 @@ using namespace tnt;
 TEST_CASE("Double", "[Double]")
 {
     xsd::Double d(42.42);
-    CHECK(math::near(static_cast<double>(d), 42.42));
+    CHECK(math::near(d.value(), 42.42));
 }

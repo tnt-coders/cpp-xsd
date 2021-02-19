@@ -8,21 +8,12 @@ namespace tnt::xsd
 class Double : public AnySimpleType<double>
 {
 public:
-    Double(double value);
-
-protected:
-    virtual Restrictions restrictions() const override
+    Double(double value)
+        : AnySimpleType(value)
     {
-        return m_restrictions;
+        this->white_space(WhiteSpace::collapse);
+        this->validate();
     }
-
-    virtual void restrictions(const Restrictions& restrictions) override
-    {
-        m_restrictions = restrictions;
-    }
-
-private:
-    Restrictions m_restrictions;
 };
 
 }  // namespace tnt::xsd

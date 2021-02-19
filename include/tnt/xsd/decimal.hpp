@@ -8,21 +8,12 @@ namespace tnt::xsd
 class Decimal : public AnySimpleType<long double>
 {
 public:
-    Decimal(const long double value);
-
-protected:
-    virtual Restrictions restrictions() const override
+    Decimal(const long double value)
+        : AnySimpleType(value)
     {
-        return m_restrictions;
+        this->white_space(WhiteSpace::collapse);
+        this->validate();
     }
-
-    virtual void restrictions(const Restrictions& restrictions) override
-    {
-        m_restrictions = restrictions;
-    }
-
-private:
-    Restrictions m_restrictions;
 };
 
 }  // namespace tnt::xsd

@@ -6,5 +6,5 @@ using namespace tnt;
 TEST_CASE("Token", "[String][NormalizedString][Token]")
 {
     xsd::Token s("\t\r\ntest\t\r\ntest\t\r\n");
-    CHECK(static_cast<std::string>(s) == "test test");
+    CHECK(s.value() == "test test");
 }

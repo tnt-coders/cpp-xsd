@@ -6,5 +6,6 @@ using namespace tnt;
 TEST_CASE("NormalizedString", "[String][NormalizedString]")
 {
     const xsd::NormalizedString s("\t\r\ntest\t\r\ntest\t\r\n");
+
     CHECK(static_cast<std::string>(s) == "   test   test   ");
 }

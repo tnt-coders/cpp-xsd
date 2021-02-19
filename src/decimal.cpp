@@ -12,9 +12,4 @@ Decimal::Decimal(const long double value)
     this->validate();
 }
 
-Decimal::Restrictions& Decimal::restrictions()
-{
-    return m_restrictions;
-}
-
 }  // namespace tnt::xsd

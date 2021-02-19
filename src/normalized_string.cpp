@@ -9,10 +9,9 @@ namespace tnt::xsd
 
 NormalizedString::NormalizedString(const std::string& value)
     : String(value)
-    , m_restriction(this)
 {
-    m_restriction.white_space(WhiteSpace::replace);
-    m_restriction.apply();
+    this->white_space(WhiteSpace::replace);
+    this->validate();
 }
 
 }  // namespace tnt::xsd

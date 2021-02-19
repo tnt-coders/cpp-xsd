@@ -9,7 +9,6 @@ namespace tnt::xsd
 
 String::String(const std::string& value)
     : AnySimpleType(value)
-    , m_restriction(this)
 {}
 
 }  // namespace tnt::xsd

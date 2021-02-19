@@ -12,15 +12,11 @@ namespace tnt::xsd
 {
 
 template <typename T>
-AnySimpleType<T>::operator value_type() const
-{
-    return m_value;
-}
-
-template <typename T>
 void AnySimpleType<T>::enumeration(const value_type& value)
 {
-    this->restrictions().enumeration.insert(value);
+    auto restrictions = this->restrictions();
+    restrictions.enumeration.insert(value);
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -33,7 +29,9 @@ void AnySimpleType<T>::fraction_digits(const size_t value, const bool fixed)
 
     m_fraction_digits_fixed = fixed;
 
-    this->restrictions().fraction_digits = value;
+    auto restrictions            = this->restrictions();
+    restrictions.fraction_digits = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -46,7 +44,9 @@ void AnySimpleType<T>::length(const size_t value, const bool fixed)
 
     m_length_fixed = fixed;
 
-    this->restrictions().length = value;
+    auto restrictions   = this->restrictions();
+    restrictions.length = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -59,7 +59,9 @@ void AnySimpleType<T>::max_exclusive(const value_type& value, const bool fixed)
 
     m_max_exclusive_fixed = fixed;
 
-    this->restrictions().max_exclusive = value;
+    auto restrictions          = this->restrictions();
+    restrictions.max_exclusive = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -72,7 +74,9 @@ void AnySimpleType<T>::max_inclusive(const value_type& value, const bool fixed)
 
     m_max_inclusive_fixed = fixed;
 
-    this->restrictions().max_inclusive = value;
+    auto restrictions          = this->restrictions();
+    restrictions.max_inclusive = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -85,7 +89,9 @@ void AnySimpleType<T>::max_length(const size_t value, const bool fixed)
 
     m_max_length_fixed = fixed;
 
-    this->restrictions().max_length = value;
+    auto restrictions       = this->restrictions();
+    restrictions.max_length = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -98,7 +104,9 @@ void AnySimpleType<T>::min_exclusive(const value_type& value, const bool fixed)
 
     m_min_exclusive_fixed = fixed;
 
-    this->restrictions().min_exclusive = value;
+    auto restrictions          = this->restrictions();
+    restrictions.min_exclusive = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -111,7 +119,9 @@ void AnySimpleType<T>::min_inclusive(const value_type& value, const bool fixed)
 
     m_min_inclusive_fixed = fixed;
 
-    this->restrictions().min_inclusive = value;
+    auto restrictions          = this->restrictions();
+    restrictions.min_inclusive = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -124,13 +134,17 @@ void AnySimpleType<T>::min_length(const size_t value, const bool fixed)
 
     m_min_length_fixed = fixed;
 
-    this->restrictions().min_length = value;
+    auto restrictions       = this->restrictions();
+    restrictions.min_length = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
 void AnySimpleType<T>::pattern(const std::string& value)
 {
-    this->restrictions().pattern.insert(value);
+    auto restrictions = this->restrictions();
+    restrictions.pattern.insert(value);
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -143,7 +157,9 @@ void AnySimpleType<T>::total_digits(const size_t value, const bool fixed)
 
     m_total_digits_fixed = fixed;
 
-    m_total_digits = value;
+    auto restrictions         = this->restrictions();
+    restrictions.total_digits = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -156,7 +172,9 @@ void AnySimpleType<T>::white_space(const WhiteSpace& value, const bool fixed)
 
     m_white_space_fixed = fixed;
 
-    this->restrictions().white_space = value;
+    auto restrictions        = this->restrictions();
+    restrictions.white_space = value;
+    this->restrictions(restrictions);
 }
 
 template <typename T>
@@ -170,7 +188,10 @@ void AnySimpleType<T>::validate() const
     this->validate_max_length();
     this->validate_min_exclusive();
     this->validate_min_inclusive();
-    this->validate_
+    this->validate_min_length();
+    this->validate_pattern();
+    this->validate_total_digits();
+    this->validate_white_space();
 }
 
 template <typename T>
@@ -203,7 +224,8 @@ void AnySimpleType<T>::validate_fraction_digits() const
     {
         const auto order_of_magnitude = std::floor(std::log(std::abs(m_value)));
 
-        if (order_of_magnitude < 0 && std::abs(order_of_magnitude) > restrictions.fraction_digits.value())
+        if (order_of_magnitude < 0
+            && std::abs(order_of_magnitude) > restrictions.fraction_digits.value())
         {
             throw std::runtime_error("restrict_fraction_digits failed - value too small");
         }
@@ -389,7 +411,7 @@ void AnySimpleType<T>::validate_pattern() const
     for (const auto& value : restrictions.pattern)
     {
         const std::regex rx(value);
-        if (std::regex_match(value_as_string, rx))
+        if (std::regex_match(this->to_string(), rx))
         {
             valid = true;
         }
@@ -447,8 +469,8 @@ void AnySimpleType<T>::validate_white_space() const
     // Nothing to do here
 }
 
-//template <typename T>
-//void AnySimpleType<T>::Restrictions::apply_white_space() const
+// template <typename T>
+// void AnySimpleType<T>::Restrictions::apply_white_space() const
 //{
 //    if (!m_white_space)
 //    {

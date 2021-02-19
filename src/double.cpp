@@ -7,10 +7,9 @@ namespace tnt::xsd
 
 Double::Double(const double value)
     : AnySimpleType(value)
-    , m_restrictions(this)
 {
-    m_restrictions.white_space(WhiteSpace::collapse);
-    m_restriction.apply();
+    this->white_space(WhiteSpace::collapse);
+    this->validate();
 }
 
 }  // namespace tnt::xsd

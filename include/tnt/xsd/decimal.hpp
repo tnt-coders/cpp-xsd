@@ -11,7 +11,15 @@ public:
     Decimal(const long double value);
 
 protected:
-    Restrictions& restrictions();
+    virtual Restrictions restrictions() const override
+    {
+        return m_restrictions;
+    }
+
+    virtual void restrictions(const Restrictions& restrictions) override
+    {
+        m_restrictions = restrictions;
+    }
 
 private:
     Restrictions m_restrictions;

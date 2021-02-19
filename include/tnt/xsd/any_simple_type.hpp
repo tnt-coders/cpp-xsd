@@ -14,7 +14,12 @@ class AnySimpleType
 public:
     using value_type = T;
 
-    explicit operator value_type() const;
+    std::string to_string() const {}
+
+    value_type value() const
+    {
+        return m_value;
+    }
 
 protected:
     enum class WhiteSpace
@@ -40,7 +45,9 @@ protected:
         std::optional<WhiteSpace>       white_space;
     };
 
-    Restrictions& restrictions();
+    virtual Restrictions restrictions() const = 0;
+
+    virtual void restrictions(const Restrictions& restrictions) = 0;
 
     AnySimpleType(const value_type& value);
 
@@ -71,7 +78,6 @@ protected:
     void validate() const;
 
 private:
-
     void validate_enumeration() const;
 
     void validate_fraction_digits() const;

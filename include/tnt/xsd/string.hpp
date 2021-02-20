@@ -11,9 +11,11 @@ namespace tnt::xsd
 class String : public AnySimpleType<std::string>
 {
 public:
-    String(const std::string& value)
+    String(const value_type& value)
         : AnySimpleType(value)
-    {}
+    {
+        this->validate();
+    }
 };
 
 }  // namespace tnt::xsd

@@ -10,7 +10,7 @@ namespace tnt::xsd
 class NormalizedString : public String
 {
 public:
-    NormalizedString(const std::string& value)
+    NormalizedString(const value_type& value)
         : String(value)
     {
         this->white_space(WhiteSpace::replace);

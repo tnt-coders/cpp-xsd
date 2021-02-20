@@ -8,7 +8,7 @@ namespace tnt::xsd
 class Decimal : public AnySimpleType<long double>
 {
 public:
-    Decimal(const long double value)
+    Decimal(const value_type& value)
         : AnySimpleType(value)
     {
         this->white_space(WhiteSpace::collapse);

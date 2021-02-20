@@ -10,7 +10,7 @@ namespace tnt::xsd
 class Token : public NormalizedString
 {
 public:
-    Token(const std::string& value)
+    Token(const value_type& value)
         : NormalizedString(value)
     {
         this->white_space(WhiteSpace::collapse);

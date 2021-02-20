@@ -1,5 +1,8 @@
 #pragma once
 
+#include <algorithm>
+#include <boost/algorithm/string.hpp>
+#include <iomanip>
 #include <optional>
 #include <regex>
 #include <string>
@@ -16,22 +19,6 @@ class AnySimpleType
 {
 public:
     using value_type = T;
-
-    std::string to_string() const
-    {
-        if constexpr (std::is_same_v<value_type, std::string>)
-        {
-            return m_value;
-        }
-
-        // TODO: Convert the value to a string
-        //       Numeric types should round properly
-        //       Boolean should match pattern restriction
-        else
-        {
-            return std::to_string(m_value);
-        }
-    }
 
     value_type value() const
     {
@@ -64,106 +51,52 @@ protected:
 
     AnySimpleType(const value_type& value)
         : m_value(value)
-    {}
+    {
+        m_restrictions[typeid(*this)] = {};
+    }
 
     void enumeration(const value_type& value)
     {
         this->restrictions().enumeration.insert(value);
     }
 
-    void fraction_digits(const size_t value, const bool fixed = false)
+    void fraction_digits(const size_t value)
     {
-        if (m_fraction_digits_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'fractionDigits'");
-        }
-
-        m_fraction_digits_fixed = fixed;
-
         this->restrictions().fraction_digits = value;
     }
 
-    void length(const size_t value, const bool fixed = false)
+    void length(const size_t value)
     {
-        if (m_length_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'length'");
-        }
-
-        m_length_fixed = fixed;
-
         this->restrictions().length = value;
     }
 
-    void max_exclusive(const value_type& value, const bool fixed = false)
+    void max_exclusive(const value_type& value)
     {
-        if (m_max_exclusive_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'maxExclusive'");
-        }
-
-        m_max_exclusive_fixed = fixed;
-
         this->restrictions().max_exclusive = value;
     }
 
-    void max_inclusive(const value_type& value, const bool fixed = false)
+    void max_inclusive(const value_type& value)
     {
-        if (m_max_inclusive_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'maxInclusive'");
-        }
-
-        m_max_inclusive_fixed = fixed;
-
         this->restrictions().max_inclusive = value;
     }
 
-    void max_length(const size_t value, const bool fixed = false)
+    void max_length(const size_t value)
     {
-        if (m_max_length_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'maxLength'");
-        }
-
-        m_max_length_fixed = fixed;
-
         this->restrictions().max_length = value;
     }
 
-    void min_exclusive(const value_type& value, const bool fixed = false)
+    void min_exclusive(const value_type& value)
     {
-        if (m_min_exclusive_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'minExclusive'");
-        }
-
-        m_min_exclusive_fixed = fixed;
-
         this->restrictions().min_exclusive = value;
     }
 
-    void min_inclusive(const value_type& value, const bool fixed = false)
+    void min_inclusive(const value_type& value)
     {
-        if (m_min_inclusive_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'minInclusive'");
-        }
-
-        m_min_inclusive_fixed = fixed;
-
         this->restrictions().min_inclusive = value;
     }
 
-    void min_length(const size_t value, const bool fixed = false)
+    void min_length(const size_t value)
     {
-        if (m_min_length_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'minLength'");
-        }
-
-        m_min_length_fixed = fixed;
-
         this->restrictions().min_length = value;
     }
 
@@ -172,27 +105,13 @@ protected:
         this->restrictions().pattern.insert(value);
     }
 
-    void total_digits(const size_t value, const bool fixed = false)
+    void total_digits(const size_t value)
     {
-        if (m_total_digits_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'totalDigits'");
-        }
-
-        m_total_digits_fixed = fixed;
-
         this->restrictions().total_digits = value;
     }
 
-    void white_space(const WhiteSpace& value, const bool fixed = false)
+    void white_space(const WhiteSpace& value)
     {
-        if (m_white_space_fixed)
-        {
-            throw std::runtime_error("Cannot restrict fixed 'whiteSpace'");
-        }
-
-        m_white_space_fixed = fixed;
-
         this->restrictions().white_space = value;
     }
 
@@ -213,6 +132,13 @@ protected:
     }
 
 private:
+    std::string to_string() const
+    {
+        std::ostringstream ss;
+        ss << this->value();
+        return ss.str();
+    }
+
     void validate_enumeration() const
     {
         const auto enumeration = this->restrictions().enumeration;
@@ -223,7 +149,6 @@ private:
 
         if (enumeration.find(this->value()) == enumeration.end())
         {
-            // TODO: better error message
             throw std::runtime_error("validate_enumeration failed");
         }
     }
@@ -244,18 +169,6 @@ private:
             {
                 throw std::runtime_error("restrict_fraction_digits failed - value too small");
             }
-
-            // TODOTODOTODO
-            //
-            // TODO: This rounding should occur when printing to an xml file (converting to a
-            // string)
-            // TODO: This should not be checked during validation
-            //
-            // Also use iomanip to set proper precision for printing
-            //
-            // TODOTODOTODO
-            // const auto scale = std::pow(10, this->restrictions().fraction_digits.value());
-            // m_simple_type->value = std::round(m_simple_type->value * scale) / scale;
         }
     }
 
@@ -272,7 +185,6 @@ private:
         {
             if (this->value().length() != length.value())
             {
-                // TODO: Better error message
                 throw std::runtime_error("restrict_length failed");
             }
         }
@@ -291,7 +203,6 @@ private:
         {
             if (this->value() >= max_exclusive.value())
             {
-                // TODO: Better error message
                 throw std::runtime_error("restrict_max_exclusive failed");
             }
         }
@@ -310,7 +221,6 @@ private:
         {
             if (this->value() > max_inclusive.value())
             {
-                // TODO: Better error message
                 throw std::runtime_error("restrict_max_inclusive failed");
             }
         }
@@ -329,7 +239,6 @@ private:
         {
             if (this->value().length() > max_length.value())
             {
-                // TODO: Better error message
                 throw std::runtime_error("restrict_max_length failed");
             }
         }
@@ -348,7 +257,6 @@ private:
         {
             if (this->value() <= min_exclusive.value())
             {
-                // TODO: Better error message
                 throw std::runtime_error("restrict_min_exclusive failed");
             }
         }
@@ -367,7 +275,6 @@ private:
         {
             if (this->value() < min_inclusive.value())
             {
-                // TODO: Better error message
                 throw std::runtime_error("restrict_min_inclusive failed");
             }
         }
@@ -386,7 +293,6 @@ private:
         {
             if (this->value().length() < min_length.value())
             {
-                // TODO: Better error message
                 throw std::runtime_error("restrict_min_length failed");
             }
         }
@@ -412,7 +318,6 @@ private:
 
         if (!valid)
         {
-            // TODO: Better error message
             throw std::runtime_error("restrict_pattern failed");
         }
     }
@@ -439,70 +344,17 @@ private:
             {
                 throw std::runtime_error("restrict_total_digits failed - value too small");
             }
-
-            // TODOTODOTODO
-            //
-            // TODO: This rounding should occur when printing to an xml file (converting to a
-            // string)
-            // TODO: This should not be checked during validation
-            //
-            // Also use iomanip to set proper precision for printing
-            //
-            // TODOTODOTODO
-            // const auto scale = std::pow(10, m_total_digits.value() -
-            // std::floor(std::log(m_simple_type->value)) - 1);
-            // m_simple_type->value = std::round(m_simple_type->value * scale) / scale;
         }
     }
 
     void validate_white_space() const
     {
-        // if (!m_white_space)
-        //{
-        //    return;
-        //}
-
-        //// Only applies to string types
-        // if constexpr (std::is_same_v<value_type, std::string>)
-        //{
-        //    constexpr auto white_space_replace = [](std::string& value) {
-        //        std::regex rx("\\t|\\r|\\n");
-        //        value = std::regex_replace(value, rx, " ");
-        //    };
-
-        //    constexpr auto white_space_collapse = [white_space_replace](std::string& value) {
-        //        white_space_replace(value);
-
-        //        std::regex rx("\\s+");
-        //        value = std::regex_replace(value, rx, " ");
-
-        //        boost::algorithm::trim(value);
-        //    };
-
-        //    switch (m_white_space.value())
-        //    {
-        //        case WhiteSpace::preserve:
-        //        {
-        //            // Do nothing
-        //            break;
-        //        }
-        //        case WhiteSpace::replace:
-        //        {
-        //            white_space_replace(m_simple_type->value);
-        //            break;
-        //        }
-        //        case WhiteSpace::collapse:
-        //        {
-        //            white_space_collapse(m_simple_type->value);
-        //            break;
-        //        }
-        //    }
-        //}
+        // There are no validation rules for whiteSpace
     }
 
     Restrictions& restrictions()
     {
-        return m_restrictions[typeid(*this)];
+        return m_restrictions.at(typeid(*this));
     }
 
     const Restrictions& restrictions() const
@@ -511,17 +363,6 @@ private:
     }
 
     std::unordered_map<std::type_index, Restrictions> m_restrictions;
-
-    bool m_fraction_digits_fixed = false;
-    bool m_length_fixed          = false;
-    bool m_max_exclusive_fixed   = false;
-    bool m_max_inclusive_fixed   = false;
-    bool m_max_length_fixed      = false;
-    bool m_min_exclusive_fixed   = false;
-    bool m_min_inclusive_fixed   = false;
-    bool m_min_length_fixed      = false;
-    bool m_total_digits_fixed    = false;
-    bool m_white_space_fixed     = false;
 
     value_type m_value;
 };

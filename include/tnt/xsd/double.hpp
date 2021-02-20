@@ -8,7 +8,7 @@ namespace tnt::xsd
 class Double : public AnySimpleType<double>
 {
 public:
-    Double(double value)
+    Double(const value_type& value)
         : AnySimpleType(value)
     {
         this->white_space(WhiteSpace::collapse);

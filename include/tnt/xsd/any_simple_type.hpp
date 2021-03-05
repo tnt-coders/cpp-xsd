@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <boost/regex.hpp>
 #include <iomanip>
 #include <optional>
 #include <regex>
@@ -112,7 +113,42 @@ protected:
 
     void white_space(const WhiteSpace& value)
     {
-        this->restrictions().white_space = value;
+        // Only applies to string types
+        if constexpr (std::is_same_v<value_type, std::string>)
+        {
+            constexpr auto white_space_replace = [](std::string& value) {
+                std::regex rx("\\t|\\r|\\n");
+                value = std::regex_replace(value, rx, " ");
+            };
+
+            constexpr auto white_space_collapse = [white_space_replace](std::string& value) {
+                white_space_replace(value);
+
+                std::regex rx("\\s+");
+                value = std::regex_replace(value, rx, " ");
+
+                boost::algorithm::trim(value);
+            };
+
+            switch (value)
+            {
+                case WhiteSpace::preserve:
+                {
+                    // Do nothing
+                    break;
+                }
+                case WhiteSpace::replace:
+                {
+                    white_space_replace(m_value);
+                    break;
+                }
+                case WhiteSpace::collapse:
+                {
+                    white_space_collapse(m_value);
+                    break;
+                }
+            }
+        }
     }
 
     void validate() const
@@ -128,7 +164,7 @@ protected:
         this->validate_min_length();
         this->validate_pattern();
         this->validate_total_digits();
-        this->validate_white_space();
+        // There are no validation rules for whiteSpace
     }
 
 private:
@@ -161,6 +197,7 @@ private:
             return;
         }
 
+        // Only applies to floating point types
         if constexpr (std::is_floating_point_v<value_type>)
         {
             const auto order_of_magnitude = std::floor(std::log(std::abs(this->value())));
@@ -309,8 +346,8 @@ private:
         bool valid = false;
         for (const auto& value : pattern)
         {
-            const std::regex rx(value);
-            if (std::regex_match(this->to_string(), rx))
+            const boost::regex rx(value, boost::regex::perl);
+            if (boost::regex_match(this->to_string(), rx))
             {
                 valid = true;
             }
@@ -345,11 +382,6 @@ private:
                 throw std::runtime_error("restrict_total_digits failed - value too small");
             }
         }
-    }
-
-    void validate_white_space() const
-    {
-        // There are no validation rules for whiteSpace
     }
 
     Restrictions& restrictions()

@@ -18,7 +18,6 @@ class CppXsd(ConanFile):
 
     default_options = {
         "shared": False,
-        "boost:header_only": True,
     }
 
     build_requires = (

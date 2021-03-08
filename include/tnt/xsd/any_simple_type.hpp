@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
 #include <iomanip>
 #include <optional>
 #include <regex>
@@ -103,7 +102,29 @@ protected:
 
     void pattern(const std::string& value)
     {
-        this->restrictions().pattern.insert(value);
+        // XML Schema regular expressions support two special character classes, "\i" and "\c"
+        std::string pattern(value);
+
+        // "\i" = [_:A-Za-z]
+        std::regex i(R"pattern(\\i)pattern");
+        pattern = std::regex_replace(pattern, i, "[_:A-Za-z]");
+
+        // "\c" = [-._:A-Za-z0-9]
+        std::regex c(R"pattern(\\c)pattern");
+        pattern = std::regex_replace(pattern, c, "[-._:A-Za-z0-9]");
+
+        // "\I" is the negation of "\i"
+        std::regex I(R"pattern(\\I)pattern");
+        pattern = std::regex_replace(pattern, I, "[^_:A-Za-z]");
+
+        // "\C" is the negation of "\c"
+        std::regex C(R"pattern(\\C)pattern");
+        pattern = std::regex_replace(pattern, c, "[^-._:A-Za-z0-9]");
+
+        // TODO: support unicode if there is a need:
+        // https://www.regular-expressions.info/shorthand.html#xml
+
+        this->restrictions().pattern.insert(pattern);
     }
 
     void total_digits(const size_t value)
@@ -346,8 +367,8 @@ private:
         bool valid = false;
         for (const auto& value : pattern)
         {
-            const boost::regex rx(value, boost::regex::perl);
-            if (boost::regex_match(this->to_string(), rx))
+            const std::regex rx(value);
+            if (std::regex_match(this->to_string(), rx))
             {
                 valid = true;
             }
@@ -370,7 +391,17 @@ private:
         // Only applies to numeric types
         if constexpr (std::is_arithmetic_v<value_type>)
         {
-            const auto order_of_magnitude = std::floor(std::log(std::abs(this->value())));
+            const auto order_of_magnitude = [&] {
+                // std::abs is not defined for unsigned types
+                if constexpr (std::is_signed_v<value_type>)
+                {
+                    return std::floor(std::log(std::abs(this->value())));
+                }
+                else
+                {
+                    return std::floor(std::log(this->value()));
+                }
+            }();
 
             if (order_of_magnitude >= total_digits.value())
             {

@@ -5,7 +5,7 @@
 namespace tnt::xsd
 {
 
-class NonNegativeInteger : public AnySimpleType<long long>
+class NonNegativeInteger : public AnySimpleType<unsigned long long>
 {
 public:
     NonNegativeInteger(const value_type& value)

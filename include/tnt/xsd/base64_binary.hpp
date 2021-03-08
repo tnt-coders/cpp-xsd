@@ -14,20 +14,16 @@ public:
         : AnySimpleType(value)
     {
         // clang-format off
-        this->pattern(
-            "(?(DEFINE)"
-                "(?<B64>[A-Za-z0-9+/])"
-                "(?<B16>[AEIMQUYcgkosw048])"
-                "(?<B04>[AQgw])"
-            ")"
+        this->pattern(R"pattern("
             "("
-                "((?&B64){4})*"
+                "([A-Za-z0-9+/]{4})*"
                 "("
-                    "(?&B64){4}|"
-                    "(?&B64){2}(?&B16)=|"
-                    "(?&B64)(?&B04)={2}"
+                    "[A-Za-z0-9+/]{4}|"
+                    "[A-Za-z0-9+/]{2}[AEIMQUYcgkosw048]=|"
+                    "[A-Za-z0-9+/][AQgw]={2}"
                 ")"
-            ")?");
+            ")?"
+            ")pattern");
         // clang-format on
         this->white_space(WhiteSpace::collapse);
         this->validate();

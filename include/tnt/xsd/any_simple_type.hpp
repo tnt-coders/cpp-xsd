@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QRegExp>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <iomanip>
@@ -51,9 +52,7 @@ protected:
 
     AnySimpleType(const value_type& value)
         : m_value(value)
-    {
-        m_restrictions[typeid(*this)] = {};
-    }
+    {}
 
     void enumeration(const value_type& value)
     {
@@ -102,29 +101,7 @@ protected:
 
     void pattern(const std::string& value)
     {
-        // XML Schema regular expressions support two special character classes, "\i" and "\c"
-        std::string pattern(value);
-
-        // "\i" = [_:A-Za-z]
-        std::regex i(R"pattern(\\i)pattern");
-        pattern = std::regex_replace(pattern, i, "[_:A-Za-z]");
-
-        // "\c" = [-._:A-Za-z0-9]
-        std::regex c(R"pattern(\\c)pattern");
-        pattern = std::regex_replace(pattern, c, "[-._:A-Za-z0-9]");
-
-        // "\I" is the negation of "\i"
-        std::regex I(R"pattern(\\I)pattern");
-        pattern = std::regex_replace(pattern, I, "[^_:A-Za-z]");
-
-        // "\C" is the negation of "\c"
-        std::regex C(R"pattern(\\C)pattern");
-        pattern = std::regex_replace(pattern, c, "[^-._:A-Za-z0-9]");
-
-        // TODO: support unicode if there is a need:
-        // https://www.regular-expressions.info/shorthand.html#xml
-
-        this->restrictions().pattern.insert(pattern);
+        this->restrictions().pattern.insert(value);
     }
 
     void total_digits(const size_t value)
@@ -187,6 +164,11 @@ protected:
         this->validate_total_digits();
         // There are no validation rules for whiteSpace
     }
+
+protected:
+    virtual Restrictions& restrictions() = 0;
+
+    virtual const Restrictions& restrictions() const = 0;
 
 private:
     std::string to_string() const
@@ -370,6 +352,7 @@ private:
             const std::regex rx(value);
             if (std::regex_match(this->to_string(), rx))
             {
+                // TODO: simply return here
                 valid = true;
             }
         }
@@ -414,18 +397,6 @@ private:
             }
         }
     }
-
-    Restrictions& restrictions()
-    {
-        return m_restrictions.at(typeid(*this));
-    }
-
-    const Restrictions& restrictions() const
-    {
-        return m_restrictions.at(typeid(*this));
-    }
-
-    std::unordered_map<std::type_index, Restrictions> m_restrictions;
 
     value_type m_value;
 };

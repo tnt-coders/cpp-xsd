@@ -1,6 +1,17 @@
-tnt_project_AddLibrary(${PROJECT_NAME} INTERFACE TARGET ${PROJECT_NAME})
+tnt_project_AddLibrary(${PROJECT_NAME}
+  TARGET
+    ${PROJECT_NAME}
+  SOURCES
+    xml.cpp
+    xml_string.cpp
+    xml_regex.cpp
+    xs_any_simple_type.cpp
+)
 
-target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
-# TODO: Try to make this private by moving implementation of any_simple_type to cpp file
-target_link_libraries(${PROJECT_NAME} INTERFACE Boost::headers)
+target_link_libraries(${PROJECT_NAME}
+  PRIVATE
+    Boost::headers
+    LibXml2::LibXml2
+)

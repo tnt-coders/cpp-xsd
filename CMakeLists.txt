@@ -22,6 +22,7 @@ tnt_project_ConanInstall(${PROJECT_NAME})
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 find_package(Boost MODULE REQUIRED)
 find_package(Catch2 CONFIG REQUIRED)
+find_package(LibXml2 MODULE REQUIRED)
 find_package(math CONFIG REQUIRED)
 
 # Enable testing for the project

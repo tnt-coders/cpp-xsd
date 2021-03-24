@@ -8,24 +8,12 @@ namespace tnt::xsd
 class xs_negative_integer : public xs_any_simple_type<long long>
 {
 public:
-    xs_negative_integer(const value_type& value)
-        : xs_any_simple_type(value)
-    {
-        this->restrict_max_exclusive(0);
-        this->restrict_white_space(white_space::collapse);
-        this->validate();
-    }
+    xs_negative_integer(const value_type& value);
 
 protected:
-    virtual restriction_set& restrictions() override
-    {
-        return m_restrictions;
-    }
+    virtual restriction_set& restrictions() override;
 
-    virtual const restriction_set& restrictions() const override
-    {
-        return m_restrictions;
-    }
+    virtual const restriction_set& restrictions() const override;
 
 private:
     restriction_set m_restrictions;

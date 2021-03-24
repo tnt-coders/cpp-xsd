@@ -1,5 +1,3 @@
-#pragma once
-
 #include "xs_any_simple_type.hpp"
 
 #include "xml.hpp"

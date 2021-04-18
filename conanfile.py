@@ -25,7 +25,7 @@ class CppXsd(ConanFile):
         "boost/1.75.0",
         "libxml2/2.9.10",
         "catch2/3.0.0-1@tnt-coders/stable",
-        "math/1.0.0@tnt-coders/stable"
+        "math/1.0.1@tnt-coders/stable"
     )
 
     exports_sources = ("CMakeLists.txt", "docs/*", "include/*", "src/*", "test/*")

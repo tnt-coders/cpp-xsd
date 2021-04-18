@@ -32,7 +32,6 @@ find_package(math CONFIG REQUIRED)
 # Note: must be in top level CMakeLists.txt
 enable_testing()
 
-add_subdirectory(docs)
 add_subdirectory(src)
 add_subdirectory(test)
 

@@ -5,8 +5,11 @@ project(xsd LANGUAGES CXX)
 
 # Get CMake modules from Git
 include(FetchContent)
-FetchContent_Declare(CMakeModules GIT_REPOSITORY https://github.com/tnt-coders/cmake-modules.git)
-FetchContent_MakeAvailable(CMakeModules)
+FetchContent_Declare(cmake-modules
+  GIT_REPOSITORY https://github.com/tnt-coders/cmake-modules.git
+  GIT_TAG v2.0.0
+)
+FetchContent_MakeAvailable(cmake-modules)
 
 # Include the required modules
 include(tnt/project/Project)
@@ -35,3 +38,8 @@ add_subdirectory(test)
 
 # Install project targets
 tnt_project_Install(${PROJECT_NAME})
+
+tnt_project_ConanPackage(${PROJECT_NAME}
+  REMOTE tnt-coders
+  USER tnt-coders
+)
